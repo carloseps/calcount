@@ -125,10 +125,11 @@ class _FoodTileState extends State<FoodTile> {
           children: [
             // por enquanto valores fixos mas depois irão ser recebidos por parametro
             // vindo de cada food
-            _buildExpandedField('Carb.', 25.7),
-            _buildExpandedField('Prot.', 30.5),
-            _buildExpandedField('Gord.', 12.4),
-            _buildExpandedField('Total', 547.9),
+            _buildExpandedField('Carb.', widget.food.carbohydrates!),
+            _buildExpandedField('Prot.', widget.food.protein!),
+            _buildExpandedField('Gord.', widget.food.fats!),
+            _buildExpandedField(
+                'Kcal', double.parse(widget.food.calories!.toString())),
           ],
         ),
       ],

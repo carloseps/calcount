@@ -1,4 +1,5 @@
 import 'package:calcount/model/meal.dart';
+import 'package:calcount/model/meal_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -15,13 +16,14 @@ class MealForm extends StatefulWidget {
 }
 
 class _MealFormState extends State<MealForm> {
-  final _nameController = TextEditingController();
   final _totalCaloriesController = TextEditingController();
   TimeOfDay? _timeController;
 
+  MealType _selectedMealType = MealType.cafe_manha;
+
   /// Retorna os dados para o widget pai por callback
   _submitForm() {
-    final name = _nameController.text;
+    final name = _selectedMealType.description;
     final calories = int.tryParse(_totalCaloriesController.text);
 
     if (name.isEmpty) {
@@ -29,6 +31,12 @@ class _MealFormState extends State<MealForm> {
     }
 
     widget.onSubmit(name, calories, _timeController);
+  }
+
+  _changeDropdownMealTypeValue(MealType? newMealType) {
+    setState(() {
+      _selectedMealType = newMealType!;
+    });
   }
 
   /// Possivelmente trocar por showTimePicker
@@ -53,14 +61,14 @@ class _MealFormState extends State<MealForm> {
           key: MealForm._formKey,
           child: Column(
             children: [
-              TextFormField(
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return "Preencha este campo";
-                  }
-                },
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Nome'),
+              DropdownButtonFormField(
+                value: _selectedMealType,
+                items: MealType.values
+                    .map<DropdownMenuItem<MealType>>((MealType value) {
+                  return DropdownMenuItem<MealType>(
+                      value: value, child: Text(value.description));
+                }).toList(),
+                onChanged: _changeDropdownMealTypeValue,
               ),
               TextFormField(
                 controller: _totalCaloriesController,

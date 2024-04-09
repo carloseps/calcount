@@ -26,6 +26,7 @@ class Meal {
 class Food {
   String name;
   double? carbohydrates;
+  double? protein;
   double? fats; //gordura
   int? calories;
   int? quantity;
@@ -37,6 +38,7 @@ class Food {
       this.fats,
       this.calories,
       this.quantity,
+      this.protein,
       this.quantityUnit});
 }
 

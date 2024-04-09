@@ -1,4 +1,5 @@
 import 'package:calcount/components/mocked_data.dart';
+import 'package:calcount/components/nav_drawer.dart';
 import 'package:calcount/components/new_meal_form.dart';
 import 'package:calcount/model/meal.dart';
 import 'package:flutter/material.dart';
@@ -61,15 +62,9 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return Scaffold(
+      drawer: const NavDrawer(),
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        leading: IconButton(
-          iconSize: iconSize,
-          icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {
-            //abrir o drawer
-          },
-        ),
         title: Text(
           widget.title,
           textScaler: textScale,
