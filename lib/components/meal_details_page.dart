@@ -1,14 +1,46 @@
+import 'package:calcount/components/new_food_form.dart';
 import 'package:flutter/material.dart';
 
 import '../model/meal.dart';
 
-class MealDetailsPage extends StatelessWidget {
-  final Meal meal;
+class MealDetailsPage extends StatefulWidget {
+  Meal meal;
 
-  const MealDetailsPage({super.key, required this.meal});
+  MealDetailsPage({super.key, required this.meal});
 
   @override
+  State<StatefulWidget> createState() => _MealDetailsPageState();
+}
+
+class _MealDetailsPageState extends State<MealDetailsPage> {
+  @override
   Widget build(BuildContext context) {
+    newFood(String _name, double? _carbohydrates, double? _fats, int? _calories,
+        int? _quantity, unit? _quantityUnit) {
+      Food _newFood = Food(
+          name: _name,
+          carbohydrates: _carbohydrates,
+          fats: _fats,
+          calories: _calories,
+          quantity: _quantity,
+          quantityUnit: _quantityUnit);
+
+      setState(() {
+        widget.meal.foods.add(_newFood);
+      });
+
+      Navigator.of(context).pop();
+    }
+
+    //Form modal
+    openFoodFormModal(BuildContext context) {
+      showModalBottomSheet(
+          context: context,
+          builder: (_) {
+            return FoodForm(newFood);
+          });
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -20,26 +52,25 @@ class MealDetailsPage extends StatelessWidget {
           },
         ),
         title: Text(
-          meal.name,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          widget.meal.name,
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         actions: [
           IconButton(
             iconSize: 34.0,
             icon: const Icon(Icons.add, color: Colors.white),
-            onPressed: () {
-              // TODO: Adicionar funcionalidade para adicionar alimentos à refeição
-            },
+            onPressed: () => openFoodFormModal(context),
           ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: ListView.builder(
-          itemCount: meal.foods.length,
+          itemCount: widget.meal.foods.length,
           itemBuilder: (context, index) {
-            final food = meal.foods[index];
+            final food = widget.meal.foods[index];
             return FoodTile(food: food);
           },
         ),
@@ -74,7 +105,8 @@ class _FoodTileState extends State<FoodTile> {
           ),
         ),
         trailing: RotationTransition(
-          turns: AlwaysStoppedAnimation(_isExpanded ? 0.5 : 0), // faz o icone rodar quando clica
+          turns: AlwaysStoppedAnimation(
+              _isExpanded ? 0.5 : 0), // faz o icone rodar quando clica
           child: const Icon(Icons.arrow_drop_down),
         ),
         onExpansionChanged: (isExpanded) {
@@ -112,7 +144,8 @@ class _FoodTileState extends State<FoodTile> {
     String unit = label == 'Total' ? 'cals' : 'g';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), // Adiciona um espaçamento vertical
+      padding: const EdgeInsets.symmetric(
+          horizontal: 8, vertical: 4), // Adiciona um espaçamento vertical
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -200,13 +233,12 @@ class MealList extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 22, vertical: 0),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 22, vertical: 0),
                     child: Text(
                       meal.toString(),
                       style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontSize: 16),
+                          color: Theme.of(context).primaryColor, fontSize: 16),
                     ),
                   ),
                   Padding(
