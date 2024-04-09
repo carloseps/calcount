@@ -1,5 +1,5 @@
+import 'package:calcount/components/meal_form.dart';
 import 'package:calcount/components/mocked_data.dart';
-import 'package:calcount/model/meal.dart';
 import 'package:flutter/material.dart';
 
 import 'components/meal_list.dart';
@@ -36,9 +36,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  _newMeal(String name, String value) {}
+
+  _openMealFormPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => MealForm(
+                onSubmit: _newMeal,
+              )),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    
     // Obtendo as informações de MediaQuery
     final mediaQuery = MediaQuery.of(context);
     // Obtendo o fator de escala de texto da MediaQuery
@@ -52,9 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
         leading: IconButton(
           iconSize: iconSize,
           icon: const Icon(Icons.menu, color: Colors.white),
-          onPressed: () {
-            //abrir o drawer
-          },
+          onPressed: () => {},
         ),
         title: Text(
           widget.title,
@@ -64,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () => _openMealFormPage(context),
               iconSize: iconSize,
               icon: const Icon(
                 Icons.add,
