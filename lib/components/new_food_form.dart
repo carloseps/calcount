@@ -1,19 +1,11 @@
 import 'package:calcount/model/meal.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 // ignore: must_be_immutable
 class FoodForm extends StatefulWidget {
   Function(String, double?, double?, int?, int?, unit?) onSubmit;
   static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  // String name;
-  // double? carbohydrates;
-  // double? fats; //gordura
-  // int? calories;
-  // int? quantity;
-  // unit? quantityUnit;
   FoodForm(this.onSubmit, {super.key});
 
   @override

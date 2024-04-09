@@ -1,17 +1,24 @@
+import 'package:calcount/components/new_food_form.dart';
 import 'package:calcount/model/meal.dart';
 import 'package:flutter/material.dart';
 import 'package:calcount/components/meal_details_page.dart'; // Importando a nova tela de detalhes da refeição
 
-class MealList extends StatelessWidget {
+class MealList extends StatefulWidget {
   final List<Meal> dailyMealList;
 
-  const MealList({super.key,
+  const MealList({
+    super.key,
     required this.dailyMealList,
   });
 
   @override
+  State<MealList> createState() => _MealListState();
+}
+
+class _MealListState extends State<MealList> {
+  @override
   Widget build(BuildContext context) {
-    if (dailyMealList.isEmpty) {
+    if (widget.dailyMealList.isEmpty) {
       return SizedBox(
         height: 300,
         child: const Center(
@@ -23,16 +30,36 @@ class MealList extends StatelessWidget {
     return SizedBox(
       height: 300,
       child: ListView.builder(
-        itemCount: dailyMealList.length,
+        itemCount: widget.dailyMealList.length,
         itemBuilder: (context, index) {
-          final meal = dailyMealList[index];
+          final meal = widget.dailyMealList[index];
+          newFood(String _name, double? _carbohydrates, double? _fats,
+              int? _calories, int? _quantity, unit? _quantityUnit) {
+            Food _newFood = Food(
+                name: _name,
+                carbohydrates: _carbohydrates,
+                fats: _fats,
+                calories: _calories,
+                quantity: _quantity,
+                quantityUnit: _quantityUnit);
+
+            setState(() {
+              meal.foods.add(_newFood);
+            });
+
+            Navigator.of(context).pop();
+          }
+
           return GestureDetector(
             onTap: () {
               // Navegar para a tela de detalhes da refeição quando clicar em uma refeição
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => MealDetailsPage(meal: meal),
+                  builder: (context) => MealDetailsPage(
+                    meal: meal,
+                    onSubmit: newFood,
+                  ),
                 ),
               );
             },
@@ -56,13 +83,12 @@ class MealList extends StatelessWidget {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 22, vertical: 0),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 22, vertical: 0),
                     child: Text(
                       meal.toString(),
                       style: TextStyle(
-                          color: Theme.of(context).primaryColor,
-                          fontSize: 16),
+                          color: Theme.of(context).primaryColor, fontSize: 16),
                     ),
                   ),
                   Padding(
@@ -75,7 +101,11 @@ class MealList extends StatelessWidget {
                             color: Theme.of(context).primaryColor,
                             child: InkWell(
                               onTap: () {
-                                // Ação ao pressionar o ícone de adição
+                                showModalBottomSheet(
+                                    context: context,
+                                    builder: (_) {
+                                      return FoodForm(newFood);
+                                    }); // Ação ao pressionar o ícone de adição
                               },
                               child: const Icon(
                                 Icons.add,

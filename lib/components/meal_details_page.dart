@@ -5,8 +5,9 @@ import '../model/meal.dart';
 
 class MealDetailsPage extends StatefulWidget {
   Meal meal;
+  Function(String, double?, double?, int?, int?, unit?) onSubmit;
 
-  MealDetailsPage({super.key, required this.meal});
+  MealDetailsPage({super.key, required this.meal, required this.onSubmit});
 
   @override
   State<StatefulWidget> createState() => _MealDetailsPageState();
@@ -15,21 +16,13 @@ class MealDetailsPage extends StatefulWidget {
 class _MealDetailsPageState extends State<MealDetailsPage> {
   @override
   Widget build(BuildContext context) {
-    newFood(String _name, double? _carbohydrates, double? _fats, int? _calories,
-        int? _quantity, unit? _quantityUnit) {
-      Food _newFood = Food(
-          name: _name,
-          carbohydrates: _carbohydrates,
-          fats: _fats,
-          calories: _calories,
-          quantity: _quantity,
-          quantityUnit: _quantityUnit);
-
+    /// Força este widget a renderizar as mudanças na lista de comidas
+    _onSubmit(String name, double? carbohydrates, double? fats, int? calories,
+        int? quantity, unit? quantityUnit) {
       setState(() {
-        widget.meal.foods.add(_newFood);
+        widget.onSubmit(
+            name, carbohydrates, fats, calories, quantity, quantityUnit);
       });
-
-      Navigator.of(context).pop();
     }
 
     //Form modal
@@ -37,7 +30,7 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
       showModalBottomSheet(
           context: context,
           builder: (_) {
-            return FoodForm(newFood);
+            return FoodForm(_onSubmit);
           });
     }
 
@@ -67,13 +60,15 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: ListView.builder(
-          itemCount: widget.meal.foods.length,
-          itemBuilder: (context, index) {
-            final food = widget.meal.foods[index];
-            return FoodTile(food: food);
-          },
-        ),
+        child: widget.meal.foods.isEmpty
+            ? Center(child: Text("Adicione um alimento clicando no botão '+'"))
+            : ListView.builder(
+                itemCount: widget.meal.foods.length,
+                itemBuilder: (context, index) {
+                  final food = widget.meal.foods[index];
+                  return FoodTile(food: food);
+                },
+              ),
       ),
     );
   }
@@ -179,97 +174,97 @@ class _FoodTileState extends State<FoodTile> {
   }
 }
 
-class MealList extends StatelessWidget {
-  final List<Meal> dailyMealList;
+// class MealList extends StatelessWidget {
+//   final List<Meal> dailyMealList;
 
-  const MealList({
-    super.key,
-    required this.dailyMealList,
-  });
+//   const MealList({
+//     super.key,
+//     required this.dailyMealList,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    if (dailyMealList.isEmpty) {
-      return const SizedBox(
-        height: 300,
-        child: Center(
-          child: Text("Vamos adicionar refeições!"),
-        ),
-      );
-    }
+//   @override
+//   Widget build(BuildContext context) {
+//     if (dailyMealList.isEmpty) {
+//       return const SizedBox(
+//         height: 300,
+//         child: Center(
+//           child: Text("Vamos adicionar refeições!"),
+//         ),
+//       );
+//     }
 
-    return SizedBox(
-      height: 300,
-      child: ListView.builder(
-        itemCount: dailyMealList.length,
-        itemBuilder: (context, index) {
-          final meal = dailyMealList[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MealDetailsPage(meal: meal),
-                ),
-              );
-            },
-            child: Card(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero,
-              ),
-              margin: const EdgeInsets.only(bottom: 30),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
-                    child: Text(
-                      "${meal.name}:",
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 22, vertical: 0),
-                    child: Text(
-                      meal.toString(),
-                      style: TextStyle(
-                          color: Theme.of(context).primaryColor, fontSize: 16),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 15, 15),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        ClipOval(
-                          child: Material(
-                            color: Theme.of(context).primaryColor,
-                            child: InkWell(
-                              onTap: () {
-                                // TODO - Ação ao pressionar o ícone de adição
-                              },
-                              child: const Icon(
-                                Icons.add,
-                                size: 30,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
+//     return SizedBox(
+//       height: 300,
+//       child: ListView.builder(
+//         itemCount: dailyMealList.length,
+//         itemBuilder: (context, index) {
+//           final meal = dailyMealList[index];
+//           return GestureDetector(
+//             onTap: () {
+//               Navigator.push(
+//                 context,
+//                 MaterialPageRoute(
+//                   builder: (context) => MealDetailsPage(meal: meal, ,),
+//                 ),
+//               );
+//             },
+//             child: Card(
+//               shape: const RoundedRectangleBorder(
+//                 borderRadius: BorderRadius.zero,
+//               ),
+//               margin: const EdgeInsets.only(bottom: 30),
+//               child: Column(
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Padding(
+//                     padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
+//                     child: Text(
+//                       "${meal.name}:",
+//                       style: TextStyle(
+//                         fontSize: 17,
+//                         fontWeight: FontWeight.bold,
+//                         color: Theme.of(context).primaryColor,
+//                       ),
+//                     ),
+//                   ),
+//                   Padding(
+//                     padding:
+//                         const EdgeInsets.symmetric(horizontal: 22, vertical: 0),
+//                     child: Text(
+//                       meal.toString(),
+//                       style: TextStyle(
+//                           color: Theme.of(context).primaryColor, fontSize: 16),
+//                     ),
+//                   ),
+//                   Padding(
+//                     padding: const EdgeInsets.fromLTRB(0, 0, 15, 15),
+//                     child: Row(
+//                       mainAxisAlignment: MainAxisAlignment.end,
+//                       children: [
+//                         ClipOval(
+//                           child: Material(
+//                             color: Theme.of(context).primaryColor,
+//                             child: InkWell(
+//                               onTap: () {
+//                                 // TODO - Ação ao pressionar o ícone de adição
+//                               },
+//                               child: const Icon(
+//                                 Icons.add,
+//                                 size: 30,
+//                                 color: Colors.white,
+//                               ),
+//                             ),
+//                           ),
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
