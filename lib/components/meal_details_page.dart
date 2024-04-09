@@ -1,6 +1,33 @@
-import 'package:calcount/model/meal.dart';
 import 'package:flutter/material.dart';
-import 'package:calcount/components/meal_details_page.dart'; // Importando a nova tela de detalhes da refeição
+
+import '../model/meal.dart';
+
+class MealDetailsPage extends StatelessWidget {
+  final Meal meal;
+
+  const MealDetailsPage({super.key, required this.meal});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(meal.name),
+      ),
+      body: ListView.builder(
+        itemCount: meal.foods.length,
+        itemBuilder: (context, index) {
+          final food = meal.foods[index];
+          return ListTile(
+            title: Text(food.name),
+            subtitle: Text(
+              '${food.quantity} ${food.quantityUnit.toString().split('.').last}',
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
 
 class MealList extends StatelessWidget {
   final List<Meal> dailyMealList;
@@ -12,9 +39,9 @@ class MealList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (dailyMealList.isEmpty) {
-      return SizedBox(
+      return const SizedBox(
         height: 300,
-        child: const Center(
+        child: Center(
           child: Text("Vamos adicionar refeições!"),
         ),
       );
@@ -28,7 +55,6 @@ class MealList extends StatelessWidget {
           final meal = dailyMealList[index];
           return GestureDetector(
             onTap: () {
-              // Navegar para a tela de detalhes da refeição quando clicar em uma refeição
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -75,12 +101,12 @@ class MealList extends StatelessWidget {
                             color: Theme.of(context).primaryColor,
                             child: InkWell(
                               onTap: () {
-                                // Ação ao pressionar o ícone de adição
+                                // TODO - Ação ao pressionar o ícone de adição
                               },
                               child: const Icon(
                                 Icons.add,
-                                size: 30, // Tamanho do ícone
-                                color: Colors.white, // Cor do ícone
+                                size: 30,
+                                color: Colors.white,
                               ),
                             ),
                           ),
