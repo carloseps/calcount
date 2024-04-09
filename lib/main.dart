@@ -1,4 +1,5 @@
 import 'package:calcount/components/mocked_data.dart';
+import 'package:calcount/components/new_meal_form.dart';
 import 'package:calcount/model/meal.dart';
 import 'package:flutter/material.dart';
 
@@ -38,13 +39,26 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
-    
     // Obtendo as informações de MediaQuery
     final mediaQuery = MediaQuery.of(context);
     // Obtendo o fator de escala de texto da MediaQuery
     final textScale = mediaQuery.textScaler;
     // Definindo o tamanho do ícone com base na largura da tela
     final iconSize = mediaQuery.size.width > 600 ? 46.0 : 34.0;
+
+    newMeal(String name, int? totalCalories, TimeOfDay? date) {
+      Meal meal = Meal(
+          name: name,
+          foods: <Food>[],
+          totalCalories: totalCalories,
+          datetime: date);
+
+      setState(() {
+        meals.add(meal);
+      });
+
+      Navigator.of(context).pop();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -64,7 +78,13 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () {
+                showModalBottomSheet(
+                    context: context,
+                    builder: (_) {
+                      return MealForm(newMeal);
+                    });
+              },
               iconSize: iconSize,
               icon: const Icon(
                 Icons.add,

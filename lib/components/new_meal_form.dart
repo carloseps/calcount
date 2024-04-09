@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
 class MealForm extends StatefulWidget {
-  Function(String, int?, DateTime?) onSubmit;
+  Function(String, int?, TimeOfDay?) onSubmit;
   static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   MealForm(this.onSubmit, {super.key});
@@ -17,7 +17,7 @@ class MealForm extends StatefulWidget {
 class _MealFormState extends State<MealForm> {
   final _nameController = TextEditingController();
   final _totalCaloriesController = TextEditingController();
-  DateTime? _dateController;
+  TimeOfDay? _timeController;
 
   /// Retorna os dados para o widget pai por callback
   _submitForm() {
@@ -28,23 +28,19 @@ class _MealFormState extends State<MealForm> {
       return;
     }
 
-    widget.onSubmit(name, calories, _dateController);
+    widget.onSubmit(name, calories, _timeController);
   }
 
   /// Possivelmente trocar por showTimePicker
   /// Abre o widget de seleção de data
   _showDatePicker() {
-    showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime(2024),
-            lastDate: DateTime(2025))
+    showTimePicker(context: context, initialTime: TimeOfDay.now())
         .then((pickedDate) {
       if (pickedDate == null) {
         return;
       }
       setState(() {
-        _dateController = pickedDate;
+        _timeController = pickedDate;
       });
     });
   }
@@ -75,7 +71,7 @@ class _MealFormState extends State<MealForm> {
                 children: <Widget>[
                   Expanded(
                     child: Text(
-                        'Data selecionada ${_dateController == null ? "Nenhuma" : DateFormat('dd/MM/yyyy').format(_dateController!)}'),
+                        'Data selecionada ${_timeController == null ? "Nenhuma" : _timeController!.format(context)}'),
                   ),
                   TextButton(
                       onPressed: _showDatePicker,
@@ -90,7 +86,7 @@ class _MealFormState extends State<MealForm> {
                         _submitForm();
                       }
                     },
-                    child: const Text('Cadastrar alimento')),
+                    child: const Text('Cadastrar refeição')),
               )
             ],
           ),
