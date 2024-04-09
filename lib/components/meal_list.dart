@@ -40,7 +40,7 @@ class MealList extends StatelessWidget {
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.zero,
               ),
-              margin: const EdgeInsets.only(bottom: 30),
+              margin: const EdgeInsets.only(bottom: 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
