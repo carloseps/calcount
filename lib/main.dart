@@ -1,12 +1,18 @@
 import 'package:calcount/components/mocked_data.dart';
 import 'package:calcount/components/nav_drawer.dart';
 import 'package:calcount/components/new_meal_form.dart';
+import 'package:calcount/firebase_options.dart';
 import 'package:calcount/model/meal.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'components/meal_list.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
