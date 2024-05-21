@@ -59,6 +59,7 @@ class _MealListState extends State<MealList> {
                   builder: (context) => MealDetailsPage(
                     meal: meal,
                     onSubmit: newFood,
+                    selectedMealName: meal.name,
                   ),
                 ),
               );
@@ -102,10 +103,12 @@ class _MealListState extends State<MealList> {
                             child: InkWell(
                               onTap: () {
                                 showModalBottomSheet(
-                                    context: context,
-                                    builder: (_) {
-                                      return FoodForm(newFood);
-                                    }); // Ação ao pressionar o ícone de adição
+                                  context: context,
+                                  builder: (_) {
+                                    // Passe o nome da refeição selecionada para o FoodForm
+                                    return FoodForm(newFood, meal.name);
+                                  },
+                                );
                               },
                               child: const Icon(
                                 Icons.add,

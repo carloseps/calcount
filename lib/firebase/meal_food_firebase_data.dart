@@ -1,6 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
-
 import 'package:calcount/model/meal.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
@@ -22,9 +20,9 @@ class MealFoodFirebaseData with ChangeNotifier {
     final data = snapshot.snapshot.value as Map<dynamic, dynamic>;
     _meals.clear();
     data.forEach((key, value) {
-      final meal = Meal(
-        name: value['name'] as String,
-        foods: (value['foods'] as List<dynamic>).map((food) => Food(
+      final List<Food> foods = [];
+      if (value['foods'] != null && (value['foods'] as List).isNotEmpty) {
+        foods.addAll((value['foods'] as List<dynamic>).map((food) => Food(
           name: food['name'] as String,
           carbohydrates: (food['carbohydrates'] as num?)?.toDouble(),
           protein: (food['protein'] as num?)?.toDouble(),
@@ -32,7 +30,11 @@ class MealFoodFirebaseData with ChangeNotifier {
           calories: food['calories'] as int?,
           quantity: food['quantity'] as int?,
           quantityUnit: unit.values.firstWhere((e) => e.toString() == 'unit.${food['quantityUnit']}'),
-        )).toList(),
+        )));
+      }
+      final meal = Meal(
+        name: value['name'] as String,
+        foods: foods,
         totalCalories: value['totalCalories'] as int?,
         datetime: value['datetime'] != null ? TimeOfDay(
           hour: (value['datetime']['hour'] as num).toInt(),
@@ -44,29 +46,23 @@ class MealFoodFirebaseData with ChangeNotifier {
     notifyListeners();
   }
 
+
   Future<void> addMeal(Meal meal) async {
     final response = await http.post(Uri.parse('$_baseUrl/meals.json'),
         body: jsonEncode({
           'name': meal.name,
-          'foods': meal.foods.map((food) => {
-            'name': food.name,
-            'carbohydrates': food.carbohydrates,
-            'protein': food.protein,
-            'fats': food.fats,
-            'calories': food.calories,
-            'quantity': food.quantity,
-            'quantityUnit': food.quantityUnit.toString().split('.').last,
-          }).toList(),
+          'foods': [],  //cria lista vazia de foods pois n tem como adicionar foods quando cadastra uma meal
           'totalCalories': meal.totalCalories,
           'datetime': meal.datetime != null ? {
             'hour': meal.datetime!.hour,
             'minute': meal.datetime!.minute,
           } : null,
         }));
-    final id = jsonDecode(response.body)['name'];
+    final id = meal.name;
     _meals.add(meal);
     notifyListeners();
   }
+
 
   Future<void> updateMeal(Meal meal) async {
     final mealRef = mealReference.child(meal.name);
@@ -105,4 +101,25 @@ class MealFoodFirebaseData with ChangeNotifier {
       return addMeal(meal);
     }
   }
+
+  Future<void> addFoodToMeal(String mealName, Food food) async {
+    final mealIndex = _meals.indexWhere((meal) => meal.name == mealName);
+    if (mealIndex >= 0) {
+      _meals[mealIndex].foods.add(food);
+
+      final mealRef = mealReference.child(mealName).child('foods').push();
+      await mealRef.set({
+        'name': food.name,
+        'carbohydrates': food.carbohydrates,
+        'protein': food.protein,
+        'fats': food.fats,
+        'calories': food.calories,
+        'quantity': food.quantity,
+        'quantityUnit': food.quantityUnit.toString().split('.').last,
+      });
+
+      notifyListeners();
+    }
+  }
+
 }

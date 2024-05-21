@@ -4,10 +4,17 @@ import 'package:flutter/material.dart';
 import '../model/meal.dart';
 
 class MealDetailsPage extends StatefulWidget {
-  Meal meal;
-  Function(String, double?, double?, int?, int?, unit?) onSubmit;
+  final Meal meal;
+  final String selectedMealName; // Adicione esta linha
+  final Function(String, double?, double?, int?, int?, unit?) onSubmit;
 
-  MealDetailsPage({super.key, required this.meal, required this.onSubmit});
+  // Adicione o parâmetro `this.selectedMealName` ao construtor
+  MealDetailsPage({
+    super.key,
+    required this.meal,
+    required this.selectedMealName,
+    required this.onSubmit,
+  });
 
   @override
   State<StatefulWidget> createState() => _MealDetailsPageState();
@@ -28,10 +35,11 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
     //Form modal
     openFoodFormModal(BuildContext context) {
       showModalBottomSheet(
-          context: context,
-          builder: (_) {
-            return FoodForm(_onSubmit);
-          });
+        context: context,
+        builder: (_) {
+          return FoodForm(_onSubmit, widget.selectedMealName);
+        },
+      );
     }
 
     return Scaffold(

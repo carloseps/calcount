@@ -1,12 +1,14 @@
-import 'package:calcount/components/mocked_data.dart';
 import 'package:calcount/components/nav_drawer.dart';
 import 'package:calcount/components/new_meal_form.dart';
 import 'package:calcount/firebase_options.dart';
-import 'package:calcount/model/meal.dart';
+import 'package:calcount/firebase/meal_food_firebase_data.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'components/meal_list.dart';
+import 'firebase/meal_food_firebase_data.dart';
+import 'model/meal.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,17 +21,20 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'CalCount',
-      theme: ThemeData(
-        //
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => MealFoodFirebaseData()),
+      ],
+      child: MaterialApp(
+        title: 'CalCount',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const MyHomePage(title: 'CalCount'),
       ),
-      home: const MyHomePage(title: 'CalCount'),
     );
   }
 }
@@ -45,25 +50,26 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   @override
+  void initState() {
+    super.initState();
+    Provider.of<MealFoodFirebaseData>(context, listen: false).fetchData();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Obtendo as informações de MediaQuery
     final mediaQuery = MediaQuery.of(context);
-    // Obtendo o fator de escala de texto da MediaQuery
     final textScale = mediaQuery.textScaler;
-    // Definindo o tamanho do ícone com base na largura da tela
     final iconSize = mediaQuery.size.width > 600 ? 46.0 : 34.0;
 
     newMeal(String name, int? totalCalories, TimeOfDay? date) {
       Meal meal = Meal(
-          name: name,
-          foods: <Food>[],
-          totalCalories: totalCalories,
-          datetime: date);
+        name: name,
+        foods: <Food>[],
+        totalCalories: totalCalories,
+        datetime: date,
+      );
 
-      setState(() {
-        meals.add(meal);
-      });
-
+      Provider.of<MealFoodFirebaseData>(context, listen: false).addMeal(meal);
       Navigator.of(context).pop();
     }
 
@@ -74,34 +80,49 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(
           widget.title,
           textScaler: textScale,
-          style:
-              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                showModalBottomSheet(
-                    context: context,
-                    builder: (_) {
-                      return MealForm(newMeal);
-                    });
-              },
-              iconSize: iconSize,
-              icon: const Icon(
-                Icons.add,
-                color: Colors.white,
-              ))
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (_) {
+                  return MealForm(newMeal);
+                },
+              );
+            },
+            iconSize: iconSize,
+            icon: const Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+          ),
         ],
         centerTitle: true,
       ),
       body: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              //meals está vindo de mocked_data
-              Expanded(child: MealList(dailyMealList: meals)),
-            ],
-          )),
+        padding: const EdgeInsets.all(20),
+        child: Consumer<MealFoodFirebaseData>(
+          builder: (context, mealData, child) {
+            if (mealData.meals.isEmpty) {
+              return const Center(
+                child: Text(
+                  'Adicione uma refeição apertando em \'+\'.',
+                  style: TextStyle(fontSize: 18),
+                  textAlign: TextAlign.center,
+                ),
+              );
+            } else {
+              return Column(
+                children: [
+                  Expanded(child: MealList(dailyMealList: mealData.meals)),
+                ],
+              );
+            }
+          },
+        ),
+      ),
     );
   }
 }
