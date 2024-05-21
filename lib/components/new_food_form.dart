@@ -86,6 +86,7 @@ class _FoodFormState extends State<FoodForm> {
                   if (value == null || value.isEmpty) {
                     return "Preencha este campo";
                   }
+                  return null;
                 },
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Nome'),
