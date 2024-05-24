@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 import 'components/meal_list.dart';
 import 'firebase/meal_food_firebase_data.dart';
 import 'model/meal.dart';
+import 'package:get/get.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +29,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => MealFoodFirebaseData()),
       ],
-      child: MaterialApp(
+      child: GetMaterialApp(
         title: 'CalCount',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

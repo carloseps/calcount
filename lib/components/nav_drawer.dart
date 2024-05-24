@@ -1,4 +1,4 @@
-import 'package:calcount/components/daily_report.dart';
+import 'package:calcount/screens/daily_report.dart';
 import 'package:calcount/components/mocked_data.dart';
 import 'package:flutter/material.dart';
 
