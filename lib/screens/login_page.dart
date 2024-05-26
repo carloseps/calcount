@@ -1,4 +1,8 @@
+import 'package:calcount/firebase/user_firebase_data.dart';
+import 'package:calcount/model/user.dart';
+import 'package:calcount/screens/app_home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:toastification/toastification.dart';
 
 import '../components/my_button.dart';
 import '../components/my_textfield.dart';
@@ -12,8 +16,41 @@ class LoginPage extends StatelessWidget {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  void signUserIn() {
-    //signIn logic
+  final UserFirebaseData userFirebaseData = UserFirebaseData();
+
+  void signUserIn(BuildContext context) async {
+    User user = await userFirebaseData.findUserByEmail(emailController.text);
+
+    if (user.id == null) {
+      toastification.show(
+        title: const Text('Não existe um usuário cadastrado com esse email.'),
+        autoCloseDuration: const Duration(seconds: 5),
+        type: ToastificationType.error,
+        style: ToastificationStyle.flat,
+      );
+
+      return;
+    }
+
+    if (user.password != passwordController.text) {
+      toastification.show(
+        title: const Text('Senha inválida.'),
+        autoCloseDuration: const Duration(seconds: 5),
+        type: ToastificationType.error,
+        style: ToastificationStyle.flat,
+      );
+
+      return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AppHomePage(
+          title: 'CalCount',
+        ),
+      ),
+    );
   }
 
   @override
@@ -26,7 +63,7 @@ class LoginPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 100,
                 backgroundImage: AssetImage('lib/images/logo2.png'),
               ),
@@ -54,7 +91,7 @@ class LoginPage extends StatelessWidget {
               const SizedBox(height: 25),
               MyButton(
                 contentText: "Entrar",
-                onTap: signUserIn,
+                onTap: () => signUserIn(context),
                 buttonColor: Colors.deepPurple,
                 textColor: Colors.white,
               ),
@@ -71,7 +108,7 @@ class LoginPage extends StatelessWidget {
                     onTap: () {
                       Get.to(() => RegisterPage(),
                           transition: Transition.circularReveal,
-                          duration: Duration(seconds: 2));
+                          duration: const Duration(seconds: 2));
                     },
                     child: const Text(
                       'Registre-se',
