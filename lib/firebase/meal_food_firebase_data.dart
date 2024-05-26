@@ -119,10 +119,26 @@ class MealFoodFirebaseData with ChangeNotifier {
   }
 
   Future<void> removeMeal(Meal meal) async {
-    final mealRef = mealReference.child(meal.name);
-    await mealRef.remove();
-    _meals.removeWhere((m) => m.name == meal.name);
-    notifyListeners();
+    try {
+      final snapshot =
+          await mealReference.orderByChild('name').equalTo(meal.name).once();
+
+      if (snapshot.snapshot.value != null) {
+        final mealData = snapshot.snapshot.value as Map<dynamic, dynamic>;
+        final mealId = mealData.keys.first;
+
+        final mealRef = mealReference.child(mealId);
+        await mealRef.remove();
+
+        _meals.removeWhere((m) => m.name == meal.name);
+
+        notifyListeners();
+      } else {
+        print("Refeição não encontrada: ${meal.name}");
+      }
+    } catch (e) {
+      print("Erro ao remover refeição: $e");
+    }
   }
 
   Future<void> saveMeal(Meal meal) {

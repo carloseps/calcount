@@ -25,18 +25,30 @@ class MealDetailsPage extends StatefulWidget {
 class _MealDetailsPageState extends State<MealDetailsPage> {
   @override
   Widget build(BuildContext context) {
-    /// Força este widget a renderizar as mudanças na lista de comidas
     _onSubmit(String name, double? carbohydrates, double? fats, int? calories,
         int? quantity, unit? quantityUnit) {
+      // Adiciona a nova comida à lista local
+      final newFood = Food(
+        name: name,
+        carbohydrates: carbohydrates,
+        fats: fats,
+        calories: calories,
+        quantity: quantity,
+        quantityUnit: quantityUnit,
+      );
       setState(() {
+        widget.meal.foods.add(newFood);
+
+        // Notifica os ouvintes sobre a mudança na lista de comidas
         widget.onSubmit(
             name, carbohydrates, fats, calories, quantity, quantityUnit);
       });
     }
 
-    _onDeleteFood(String mealName, String foodName){
+    _onDeleteFood(String mealName, String foodName) {
       setState(() {
         widget.onDeleteFood(mealName, foodName);
+        widget.meal.foods.removeWhere((food) => food.name == foodName);
       });
     }
 
@@ -92,17 +104,19 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
                       itemCount: widget.meal.foods.length,
                       itemBuilder: (context, index) {
                         final food = widget.meal.foods[index];
-                        return FoodTile(food: food, onDeleteFood: _onDeleteFood, mealName: widget.meal.name, foodIndex: index,);
+                        return FoodTile(
+                          food: food,
+                          onDeleteFood: _onDeleteFood,
+                          mealName: widget.meal.name,
+                          foodIndex: index,
+                        );
                       },
                     ),
             ),
             ElevatedButton(
               onPressed: () {
-                // Adicione a lógica para deletar a refeição aqui
-                //_onDelete();
                 widget.onDelete(widget.meal);
-                Navigator.pop(
-                    context); // Volta para a tela anterior após deletar a refeição
+                Navigator.pop(context);
               },
               child: const Text('Deletar refeição'),
             ),
@@ -119,7 +133,12 @@ class FoodTile extends StatefulWidget {
   final int foodIndex;
   final Function(String mealName, String foodName) onDeleteFood;
 
-  const FoodTile({super.key, required this.food, required this.onDeleteFood, required this.mealName, required this.foodIndex});
+  const FoodTile(
+      {super.key,
+      required this.food,
+      required this.onDeleteFood,
+      required this.mealName,
+      required this.foodIndex});
 
   @override
   _FoodTileState createState() => _FoodTileState();
@@ -154,11 +173,11 @@ class _FoodTileState extends State<FoodTile> {
         children: [
           _buildExpandedContent(),
           ElevatedButton(
-              onPressed: () {
-                widget.onDeleteFood(widget.mealName, widget.food.name);
-              },
-              child: const Text('Deletar comida'),
-            )
+            onPressed: () {
+              widget.onDeleteFood(widget.mealName, widget.food.name);
+            },
+            child: const Text('Deletar comida'),
+          )
         ],
       ),
     );

@@ -68,12 +68,13 @@ class _MyHomePageState extends State<MyHomePage> {
       Meal meal = Meal(
         name: name,
         foods: <Food>[],
-        totalCalories: totalCalories,
+        totalCalories: totalCalories, 
         datetime: date,
       );
 
       Provider.of<MealFoodFirebaseData>(context, listen: false).addMeal(meal);
       Navigator.of(context).pop();
+      setState(() {});
     }
 
     return Scaffold(
