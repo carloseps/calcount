@@ -7,14 +7,16 @@ class MealDetailsPage extends StatefulWidget {
   final Meal meal;
   final String selectedMealName; // Adicione esta linha
   final Function(String, double?, double?, int?, int?, unit?) onSubmit;
+  final Function(Meal meal) onDelete;
+  final Function(String mealName, String foodName) onDeleteFood;
 
-  // Adicione o parâmetro `this.selectedMealName` ao construtor
-  MealDetailsPage({
-    super.key,
-    required this.meal,
-    required this.selectedMealName,
-    required this.onSubmit,
-  });
+  MealDetailsPage(
+      {super.key,
+      required this.meal,
+      required this.selectedMealName,
+      required this.onSubmit,
+      required this.onDelete,
+      required this.onDeleteFood});
 
   @override
   State<StatefulWidget> createState() => _MealDetailsPageState();
@@ -29,6 +31,18 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
       setState(() {
         widget.onSubmit(
             name, carbohydrates, fats, calories, quantity, quantityUnit);
+      });
+    }
+
+    _onDeleteFood(String mealName, String foodName){
+      setState(() {
+        widget.onDeleteFood(mealName, foodName);
+      });
+    }
+
+    _onDelete() {
+      setState(() {
+        widget.onDelete(widget.meal);
       });
     }
 
@@ -68,15 +82,32 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: widget.meal.foods.isEmpty
-            ? Center(child: Text("Adicione um alimento clicando no botão '+'"))
-            : ListView.builder(
-                itemCount: widget.meal.foods.length,
-                itemBuilder: (context, index) {
-                  final food = widget.meal.foods[index];
-                  return FoodTile(food: food);
-                },
-              ),
+        child: Column(
+          children: [
+            Expanded(
+              child: widget.meal.foods.isEmpty
+                  ? Center(
+                      child: Text("Adicione um alimento clicando no botão '+'"))
+                  : ListView.builder(
+                      itemCount: widget.meal.foods.length,
+                      itemBuilder: (context, index) {
+                        final food = widget.meal.foods[index];
+                        return FoodTile(food: food, onDeleteFood: _onDeleteFood, mealName: widget.meal.name, foodIndex: index,);
+                      },
+                    ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Adicione a lógica para deletar a refeição aqui
+                //_onDelete();
+                widget.onDelete(widget.meal);
+                Navigator.pop(
+                    context); // Volta para a tela anterior após deletar a refeição
+              },
+              child: const Text('Deletar refeição'),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -84,8 +115,11 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
 
 class FoodTile extends StatefulWidget {
   final Food food;
+  final String mealName;
+  final int foodIndex;
+  final Function(String mealName, String foodName) onDeleteFood;
 
-  const FoodTile({super.key, required this.food});
+  const FoodTile({super.key, required this.food, required this.onDeleteFood, required this.mealName, required this.foodIndex});
 
   @override
   _FoodTileState createState() => _FoodTileState();
@@ -119,6 +153,12 @@ class _FoodTileState extends State<FoodTile> {
         },
         children: [
           _buildExpandedContent(),
+          ElevatedButton(
+              onPressed: () {
+                widget.onDeleteFood(widget.mealName, widget.food.name);
+              },
+              child: const Text('Deletar comida'),
+            )
         ],
       ),
     );
@@ -182,98 +222,3 @@ class _FoodTileState extends State<FoodTile> {
     );
   }
 }
-
-// class MealList extends StatelessWidget {
-//   final List<Meal> dailyMealList;
-
-//   const MealList({
-//     super.key,
-//     required this.dailyMealList,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     if (dailyMealList.isEmpty) {
-//       return const SizedBox(
-//         height: 300,
-//         child: Center(
-//           child: Text("Vamos adicionar refeições!"),
-//         ),
-//       );
-//     }
-
-//     return SizedBox(
-//       height: 300,
-//       child: ListView.builder(
-//         itemCount: dailyMealList.length,
-//         itemBuilder: (context, index) {
-//           final meal = dailyMealList[index];
-//           return GestureDetector(
-//             onTap: () {
-//               Navigator.push(
-//                 context,
-//                 MaterialPageRoute(
-//                   builder: (context) => MealDetailsPage(meal: meal, ,),
-//                 ),
-//               );
-//             },
-//             child: Card(
-//               shape: const RoundedRectangleBorder(
-//                 borderRadius: BorderRadius.zero,
-//               ),
-//               margin: const EdgeInsets.only(bottom: 30),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-//                   Padding(
-//                     padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
-//                     child: Text(
-//                       "${meal.name}:",
-//                       style: TextStyle(
-//                         fontSize: 17,
-//                         fontWeight: FontWeight.bold,
-//                         color: Theme.of(context).primaryColor,
-//                       ),
-//                     ),
-//                   ),
-//                   Padding(
-//                     padding:
-//                         const EdgeInsets.symmetric(horizontal: 22, vertical: 0),
-//                     child: Text(
-//                       meal.toString(),
-//                       style: TextStyle(
-//                           color: Theme.of(context).primaryColor, fontSize: 16),
-//                     ),
-//                   ),
-//                   Padding(
-//                     padding: const EdgeInsets.fromLTRB(0, 0, 15, 15),
-//                     child: Row(
-//                       mainAxisAlignment: MainAxisAlignment.end,
-//                       children: [
-//                         ClipOval(
-//                           child: Material(
-//                             color: Theme.of(context).primaryColor,
-//                             child: InkWell(
-//                               onTap: () {
-//                                 // TODO - Ação ao pressionar o ícone de adição
-//                               },
-//                               child: const Icon(
-//                                 Icons.add,
-//                                 size: 30,
-//                                 color: Colors.white,
-//                               ),
-//                             ),
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }

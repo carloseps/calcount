@@ -7,10 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'components/meal_list.dart';
-import 'firebase/meal_food_firebase_data.dart';
 import 'model/meal.dart';
 import 'package:get/get.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,10 +49,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  late Future<void> _fetchMealsFuture;
+
   @override
   void initState() {
     super.initState();
-    Provider.of<MealFoodFirebaseData>(context, listen: false).fetchData();
+    _fetchMealsFuture =
+        Provider.of<MealFoodFirebaseData>(context, listen: false).fetchData();
   }
 
   @override
@@ -82,7 +83,8 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(
           widget.title,
           textScaler: textScale,
-          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
           IconButton(
@@ -103,27 +105,39 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
         centerTitle: true,
       ),
-      body: Container(
-        padding: const EdgeInsets.all(20),
-        child: Consumer<MealFoodFirebaseData>(
-          builder: (context, mealData, child) {
-            if (mealData.meals.isEmpty) {
-              return const Center(
-                child: Text(
-                  'Adicione uma refeição apertando em \'+\'.',
-                  style: TextStyle(fontSize: 18),
-                  textAlign: TextAlign.center,
-                ),
-              );
-            } else {
-              return Column(
-                children: [
-                  Expanded(child: MealList(dailyMealList: mealData.meals)),
-                ],
-              );
-            }
-          },
-        ),
+      body: FutureBuilder(
+        future: _fetchMealsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return const Center(child: Text('Erro ao carregar dados.'));
+          } else {
+            return Container(
+              padding: const EdgeInsets.all(20),
+              child: Consumer<MealFoodFirebaseData>(
+                builder: (context, mealData, child) {
+                  if (mealData.meals.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'Adicione uma refeição apertando em \'+\'.',
+                        style: TextStyle(fontSize: 18),
+                        textAlign: TextAlign.center,
+                      ),
+                    );
+                  } else {
+                    return Column(
+                      children: [
+                        Expanded(
+                            child: MealList(dailyMealList: mealData.meals)),
+                      ],
+                    );
+                  }
+                },
+              ),
+            );
+          }
+        },
       ),
     );
   }
