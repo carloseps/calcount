@@ -260,4 +260,35 @@ class MealFoodFirebaseData with ChangeNotifier {
       print("Erro ao remover comida da refeição: $e");
     }
   }
+
+  Future<Food> editFoodFromMeal(String mealName, Food food) async {
+    final meal =
+        await mealReference.orderByChild('name').equalTo(mealName).once();
+
+    if (meal.snapshot.value != null) {
+      final mealData = meal.snapshot.value as Map<dynamic, dynamic>;
+      final mealId = mealData.keys.first;
+
+      // Referência à lista de comidas dentro da refeição existente
+      final foodsRef = mealReference.child(mealId).child('foods');
+      final foodsSnapshot =
+          await foodsRef.orderByChild('name').equalTo(food.name).once();
+      final foodData = foodsSnapshot.snapshot.value as Map<dynamic, dynamic>;
+      final foodId = foodData.keys.first;
+
+      final foodToUpdate = foodsRef.child(foodId);
+
+      await foodToUpdate.update({
+        "calories": food.calories ?? 0,
+        "carbohydrates": food.carbohydrates ?? 0,
+        "fats": food.fats ?? 0,
+        "name": food.name.isEmpty ? "Sem nome" : food.name,
+        "protein": food.protein ?? 0,
+        "quantity": food.quantity ?? 0,
+        "quantityUnit": food.quantityUnit.toString().split('.').last,
+      });
+    }
+    notifyListeners();
+    return Future.value(food);
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:calcount/components/edit_food_form.dart';
 import 'package:calcount/components/new_food_form.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,7 @@ class MealDetailsPage extends StatefulWidget {
   final Function(String, double?, double?, int?, int?, unit?) onSubmit;
   final Function(Meal meal) onDelete;
   final Function(String mealName, String foodName) onDeleteFood;
+  final Function(String mealName, Food food) onEditFood;
 
   MealDetailsPage(
       {super.key,
@@ -16,6 +18,7 @@ class MealDetailsPage extends StatefulWidget {
       required this.selectedMealName,
       required this.onSubmit,
       required this.onDelete,
+      required this.onEditFood,
       required this.onDeleteFood});
 
   @override
@@ -49,6 +52,14 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
       setState(() {
         widget.onDeleteFood(mealName, foodName);
         widget.meal.foods.removeWhere((food) => food.name == foodName);
+      });
+    }
+
+    _onEditFood(String mealName, Food food) async {
+      widget.onEditFood(mealName, food);
+      setState(() {
+        final index = widget.meal.foods.indexWhere((f) => f.name == food.name);
+        widget.meal.foods[index] = food;
       });
     }
 
@@ -107,6 +118,7 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
                         return FoodTile(
                           food: food,
                           onDeleteFood: _onDeleteFood,
+                          onEditFood: _onEditFood,
                           mealName: widget.meal.name,
                           foodIndex: index,
                         );
@@ -132,12 +144,14 @@ class FoodTile extends StatefulWidget {
   final String mealName;
   final int foodIndex;
   final Function(String mealName, String foodName) onDeleteFood;
+  final Function(String mealName, Food food) onEditFood;
 
   const FoodTile(
       {super.key,
       required this.food,
       required this.onDeleteFood,
       required this.mealName,
+      required this.onEditFood,
       required this.foodIndex});
 
   @override
@@ -146,6 +160,15 @@ class FoodTile extends StatefulWidget {
 
 class _FoodTileState extends State<FoodTile> {
   bool _isExpanded = false;
+
+  openFoodEditModal(BuildContext context, String mealName, Food food) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return FoodEditForm(mealName, food, widget.onEditFood);
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -172,11 +195,22 @@ class _FoodTileState extends State<FoodTile> {
         },
         children: [
           _buildExpandedContent(),
-          ElevatedButton(
-            onPressed: () {
-              widget.onDeleteFood(widget.mealName, widget.food.name);
-            },
-            child: const Text('Deletar comida'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  widget.onDeleteFood(widget.mealName, widget.food.name);
+                },
+                child: const Text('Deletar comida'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  openFoodEditModal(context, widget.mealName, widget.food);
+                },
+                child: const Text('Editar comida'),
+              )
+            ],
           )
         ],
       ),

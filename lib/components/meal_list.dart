@@ -62,6 +62,11 @@ class _MealListState extends State<MealList> {
                 .removeFoodFromMeal(mealName, foodName);
           }
 
+          Future<Food> editFood(String mealName, Food food) async {
+            return Provider.of<MealFoodFirebaseData>(context, listen: false)
+                .editFoodFromMeal(mealName, food);
+          }
+
           return GestureDetector(
             onTap: () {
               // Navegar para a tela de detalhes da refeição quando clicar em uma refeição
@@ -73,6 +78,7 @@ class _MealListState extends State<MealList> {
                     onSubmit: newFood,
                     onDelete: deleteMeal,
                     onDeleteFood: deleteFood,
+                    onEditFood: editFood,
                     selectedMealName: meal.name,
                   ),
                 ),
