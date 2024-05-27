@@ -1,5 +1,7 @@
 import 'package:calcount/firebase_options.dart';
 import 'package:calcount/firebase/meal_food_firebase_data.dart';
+import 'package:calcount/model/user.dart';
+import 'package:calcount/providers/user_provider.dart';
 import 'package:calcount/screens/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +26,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => MealFoodFirebaseData()),
+        ChangeNotifierProvider(create: (context) => UserProvider())
       ],
       child: ToastificationWrapper(
         child: GetMaterialApp(

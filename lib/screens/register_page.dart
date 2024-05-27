@@ -20,7 +20,8 @@ class RegisterPage extends StatelessWidget {
   final UserFirebaseData userFirebaseData = UserFirebaseData();
 
   void signUpUser() async {
-    User user = await userFirebaseData.findUserByEmail(emailController.text);
+    User user = await userFirebaseData.findUserByAttribute(
+        'email', emailController.text);
 
     if (user.id != null) {
       toastification.show(

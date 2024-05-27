@@ -1,7 +1,9 @@
 import 'package:calcount/firebase/user_firebase_data.dart';
 import 'package:calcount/model/user.dart';
+import 'package:calcount/providers/user_provider.dart';
 import 'package:calcount/screens/app_home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
 import '../components/my_button.dart';
@@ -19,7 +21,8 @@ class LoginPage extends StatelessWidget {
   final UserFirebaseData userFirebaseData = UserFirebaseData();
 
   void signUserIn(BuildContext context) async {
-    User user = await userFirebaseData.findUserByEmail(emailController.text);
+    User user = await userFirebaseData.findUserByAttribute(
+        'email', emailController.text);
 
     if (user.id == null) {
       toastification.show(
@@ -43,14 +46,15 @@ class LoginPage extends StatelessWidget {
       return;
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const AppHomePage(
-          title: 'CalCount',
-        ),
-      ),
-    );
+    Provider.of<UserProvider>(context, listen: false).setCurrentUser(user);
+
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (BuildContext context) => const AppHomePage(
+                  title: 'CalCount',
+                )),
+        ModalRoute.withName('/home'));
   }
 
   @override
