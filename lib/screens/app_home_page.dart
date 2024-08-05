@@ -1,8 +1,11 @@
+import 'dart:io';
+
 import 'package:calcount/components/meal_list.dart';
 import 'package:calcount/components/nav_drawer.dart';
 import 'package:calcount/components/new_meal_form.dart';
 import 'package:calcount/firebase/meal_food_firebase_data.dart';
 import 'package:calcount/model/meal.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,12 +34,35 @@ class _AppHomePageState extends State<AppHomePage> {
     final textScale = mediaQuery.textScaler;
     final iconSize = mediaQuery.size.width > 600 ? 46.0 : 34.0;
 
-    newMeal(String name, int? totalCalories, TimeOfDay? date) {
+    Future<String> uploadImage(File imageFile) async {
+      try {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('meals/${DateTime.now().toIso8601String()}');
+        final uploadTask = storageRef.putFile(imageFile);
+        final snapshot = await uploadTask.whenComplete(() {});
+        final downloadUrl = await snapshot.ref.getDownloadURL();
+        return downloadUrl;
+      } catch (e) {
+        print('Error uploading image: $e');
+        return '';
+      }
+    }
+
+    Future<void> newMeal(
+        String name, int? totalCalories, TimeOfDay? date, File? file) async {
+      String? imageUrl;
+      if (file != null) {
+        imageUrl =
+            await uploadImage(file); // Faz o upload da imagem e obtém a URL
+      }
+
       Meal meal = Meal(
         name: name,
         foods: <Food>[],
         totalCalories: totalCalories,
         datetime: date,
+        imageUrl: imageUrl
       );
 
       Provider.of<MealFoodFirebaseData>(context, listen: false).addMeal(meal);

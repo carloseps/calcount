@@ -1,12 +1,14 @@
+import 'dart:io';
 import 'package:calcount/model/meal.dart';
 import 'package:calcount/model/meal_type.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
 
 // ignore: must_be_immutable
 class MealForm extends StatefulWidget {
-  Function(String, int?, TimeOfDay?) onSubmit;
+  Function(String, int?, TimeOfDay?, File?) onSubmit;
   static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   MealForm(this.onSubmit, {super.key});
@@ -18,6 +20,8 @@ class MealForm extends StatefulWidget {
 class _MealFormState extends State<MealForm> {
   final _totalCaloriesController = TextEditingController();
   TimeOfDay? _timeController;
+  File? _imageFile;
+  final ImagePicker _picker = ImagePicker();
 
   MealType _selectedMealType = MealType.cafe_manha;
 
@@ -30,7 +34,7 @@ class _MealFormState extends State<MealForm> {
       return;
     }
 
-    widget.onSubmit(name, calories, _timeController);
+    widget.onSubmit(name, calories, _timeController, _imageFile);
   }
 
   _changeDropdownMealTypeValue(MealType? newMealType) {
@@ -39,18 +43,55 @@ class _MealFormState extends State<MealForm> {
     });
   }
 
-  /// Possivelmente trocar por showTimePicker
   /// Abre o widget de seleção de data
-  _showDatePicker() {
+  _showTimePicker() {
     showTimePicker(context: context, initialTime: TimeOfDay.now())
-        .then((pickedDate) {
-      if (pickedDate == null) {
+        .then((pickedTime) {
+      if (pickedTime == null) {
         return;
       }
       setState(() {
-        _timeController = pickedDate;
+        _timeController = pickedTime;
       });
     });
+  }
+
+  /// Abre o seletor de imagem
+  _showImagePicker() async {
+    final pickedFile = await showDialog<XFile>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Escolha uma opção'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () async {
+                final pickedFile = await _picker.pickImage(
+                  source: ImageSource.camera,
+                );
+                Navigator.of(context).pop(pickedFile);
+              },
+              child: const Text('Tirar Foto'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final pickedFile = await _picker.pickImage(
+                  source: ImageSource.gallery,
+                );
+                Navigator.of(context).pop(pickedFile);
+              },
+              child: const Text('Selecionar da Galeria'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
   }
 
   @override
@@ -82,8 +123,21 @@ class _MealFormState extends State<MealForm> {
                         'Data selecionada ${_timeController == null ? "Nenhuma" : _timeController!.format(context)}'),
                   ),
                   TextButton(
-                      onPressed: _showDatePicker,
-                      child: const Text('Selecionar data'))
+                      onPressed: _showTimePicker,
+                      child: const Text('Selecionar hora'))
+                ],
+              ),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Text(
+                        _imageFile == null
+                            ? 'Nenhuma imagem selecionada'
+                            : 'Imagem selecionada: ${_imageFile!.path}'),
+                  ),
+                  TextButton(
+                      onPressed: _showImagePicker,
+                      child: const Text('Selecionar Imagem'))
                 ],
               ),
               Padding(

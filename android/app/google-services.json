@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "1080393734575",
+    "firebase_url": "https://calcount-f6f51-default-rtdb.firebaseio.com",
     "project_id": "calcount-f6f51",
     "storage_bucket": "calcount-f6f51.appspot.com"
   },

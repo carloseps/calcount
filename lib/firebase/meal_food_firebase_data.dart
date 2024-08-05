@@ -86,6 +86,7 @@ class MealFoodFirebaseData with ChangeNotifier {
                   'minute': meal.datetime!.minute,
                 }
               : null,
+          'imageUrl': meal.imageUrl,
         }));
     final id = meal.name;
     _meals.add(meal);

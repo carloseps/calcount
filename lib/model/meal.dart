@@ -5,12 +5,14 @@ class Meal {
   List<Food> foods;
   int? totalCalories;
   TimeOfDay? datetime;
+  String? imageUrl;
 
   Meal(
       {required this.name,
       required this.foods,
       this.totalCalories,
-      this.datetime});
+      this.datetime,
+      this.imageUrl});
 
   @override
   String toString() {

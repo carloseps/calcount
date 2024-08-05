@@ -46,6 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1080393734575',
     projectId: 'calcount-f6f51',
     authDomain: 'calcount-f6f51.firebaseapp.com',
+    databaseURL: 'https://calcount-f6f51-default-rtdb.firebaseio.com',
     storageBucket: 'calcount-f6f51.appspot.com',
   );
 
@@ -54,6 +55,7 @@ class DefaultFirebaseOptions {
     appId: '1:1080393734575:android:f7980e3fcb35e7195f375a',
     messagingSenderId: '1080393734575',
     projectId: 'calcount-f6f51',
+    databaseURL: 'https://calcount-f6f51-default-rtdb.firebaseio.com',
     storageBucket: 'calcount-f6f51.appspot.com',
   );
 
@@ -62,6 +64,7 @@ class DefaultFirebaseOptions {
     appId: '1:1080393734575:ios:fa8b1488165c28d35f375a',
     messagingSenderId: '1080393734575',
     projectId: 'calcount-f6f51',
+    databaseURL: 'https://calcount-f6f51-default-rtdb.firebaseio.com',
     storageBucket: 'calcount-f6f51.appspot.com',
     iosBundleId: 'com.example.calcount',
   );
@@ -71,6 +74,7 @@ class DefaultFirebaseOptions {
     appId: '1:1080393734575:ios:fa8b1488165c28d35f375a',
     messagingSenderId: '1080393734575',
     projectId: 'calcount-f6f51',
+    databaseURL: 'https://calcount-f6f51-default-rtdb.firebaseio.com',
     storageBucket: 'calcount-f6f51.appspot.com',
     iosBundleId: 'com.example.calcount',
   );
@@ -81,6 +85,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1080393734575',
     projectId: 'calcount-f6f51',
     authDomain: 'calcount-f6f51.firebaseapp.com',
+    databaseURL: 'https://calcount-f6f51-default-rtdb.firebaseio.com',
     storageBucket: 'calcount-f6f51.appspot.com',
   );
+
 }
