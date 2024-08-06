@@ -5,6 +5,7 @@ import 'package:calcount/components/nav_drawer.dart';
 import 'package:calcount/components/new_meal_form.dart';
 import 'package:calcount/firebase/meal_food_firebase_data.dart';
 import 'package:calcount/model/meal.dart';
+import 'package:calcount/providers/user_provider.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,8 +25,9 @@ class _AppHomePageState extends State<AppHomePage> {
   @override
   void initState() {
     super.initState();
+    final user_id = Provider.of<UserProvider>(context, listen: false).currentUser!.id;
     _fetchMealsFuture =
-        Provider.of<MealFoodFirebaseData>(context, listen: false).fetchData();
+        Provider.of<MealFoodFirebaseData>(context, listen: false).fetchData(user_id!);
   }
 
   @override
@@ -57,12 +59,13 @@ class _AppHomePageState extends State<AppHomePage> {
             await uploadImage(file); // Faz o upload da imagem e obtém a URL
       }
 
+      print(Provider.of<UserProvider>(context, listen: false).currentUser?.id);
       Meal meal = Meal(
         name: name,
         foods: <Food>[],
-        // totalCalories: totalCalories,
         datetime: date,
-        imageUrl: imageUrl
+        imageUrl: imageUrl,
+        user_id: Provider.of<UserProvider>(context, listen: false).currentUser?.id
       );
 
       Provider.of<MealFoodFirebaseData>(context, listen: false).addMeal(meal);

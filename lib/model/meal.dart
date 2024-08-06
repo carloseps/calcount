@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class Meal {
   String name;
   List<Food> foods;
-  // int? _totalCalories;
+  String? user_id;
   TimeOfDay? datetime;
   String? imageUrl;
 
@@ -15,9 +15,10 @@ class Meal {
       {
       required this.name,
       required this.foods,
-      // this.totalCalories,
       this.datetime,
-      this.imageUrl});
+      this.imageUrl,
+      required this.user_id
+      });
 
   @override
   String toString() {

@@ -16,54 +16,59 @@ class MealFoodFirebaseData with ChangeNotifier {
     return [..._meals];
   }
 
-  Future<void> fetchData() async {
+  Future<void> fetchData(String user_id) async {
     try {
-      final snapshot = await mealReference.once();
+      _meals.clear();
+      final snapshot = await mealReference.orderByChild("user_id").equalTo(user_id).once();
+
       if (snapshot.snapshot.value != null) {
         final data = snapshot.snapshot.value as Map<dynamic, dynamic>;
-        _meals.clear();
+
         data.forEach((key, value) {
           final List<Food> foods = [];
-          if (value != null &&
-              value is Map &&
-              value['foods'] != null &&
-              value['foods'] is Map) {
-            final foodData = value['foods'] as Map<dynamic, dynamic>;
-            foodData.forEach((foodKey, foodValue) {
-              if (foodValue != null && foodValue is Map) {
-                foods.add(Food(
-                  name: foodValue['name'] as String? ?? '',
-                  carbohydrates:
-                      (foodValue['carbohydrates'] as num?)?.toDouble(),
-                  protein: (foodValue['protein'] as num?)?.toDouble(),
-                  fats: (foodValue['fats'] as num?)?.toDouble(),
-                  calories: foodValue['calories'] as int?,
-                  quantity: foodValue['quantity'] as int?,
-                  quantityUnit: foodValue['quantityUnit'] != null
-                      ? unit.values.firstWhere(
-                          (e) =>
-                              e.toString() ==
-                              'unit.${foodValue['quantityUnit']}',
-                          orElse: () => unit.g,
-                        )
-                      : null,
-                ));
-              }
-            });
+          print("Value $value");
+          print("Refeição user_id: ${value["user_id"]}");
+          print("user_id: $user_id");
+          if (value != null && value is Map && value['user_id'] == user_id) {
+            print("Refeição válida");
+            if(value['foods'] != null && value['foods'] is Map) {
+              final foodData = value['foods'] as Map<dynamic, dynamic>;
+              foodData.forEach((foodKey, foodValue) {
+                if (foodValue != null && foodValue is Map) {
+                  foods.add(Food(
+                    name: foodValue['name'] as String? ?? '',
+                    carbohydrates:
+                        (foodValue['carbohydrates'] as num?)?.toDouble(),
+                    protein: (foodValue['protein'] as num?)?.toDouble(),
+                    fats: (foodValue['fats'] as num?)?.toDouble(),
+                    calories: foodValue['calories'] as int?,
+                    quantity: foodValue['quantity'] as int?,
+                    quantityUnit: foodValue['quantityUnit'] != null
+                        ? unit.values.firstWhere(
+                            (e) =>
+                                e.toString() ==
+                                'unit.${foodValue['quantityUnit']}',
+                            orElse: () => unit.g,
+                          )
+                        : null,
+                  ));
+                }
+              });
+            }
+            final meal = Meal(
+                name: value['name'] as String? ?? '', // Corrigido aqui
+                foods: foods,
+                datetime: value['datetime'] != null
+                    ? TimeOfDay(
+                  hour: (value['datetime']['hour'] as num).toInt(),
+                  minute: (value['datetime']['minute'] as num).toInt(),
+                )
+                    : null,
+                imageUrl: value['imageUrl'],
+                user_id: value["user_id"]
+            );
+            _meals.add(meal);
           }
-          final meal = Meal(
-            name: value['name'] as String? ?? '', // Corrigido aqui
-            foods: foods,
-            // totalCalories: value['totalCalories'] as int,
-            datetime: value['datetime'] != null
-                ? TimeOfDay(
-                    hour: (value['datetime']['hour'] as num).toInt(),
-                    minute: (value['datetime']['minute'] as num).toInt(),
-                  )
-                : null,
-            imageUrl: value['imageUrl']
-          );
-          _meals.add(meal);
         });
       } else {
         print('Nenhum dado encontrado no snapshot.');
@@ -80,7 +85,6 @@ class MealFoodFirebaseData with ChangeNotifier {
           'name': meal.name,
           'foods':
               [], //cria lista vazia de foods pois n tem como adicionar foods quando cadastra uma meal
-          // 'totalCalories': meal.totalCalories,
           'datetime': meal.datetime != null
               ? {
                   'hour': meal.datetime!.hour,
@@ -88,6 +92,7 @@ class MealFoodFirebaseData with ChangeNotifier {
                 }
               : null,
           'imageUrl': meal.imageUrl,
+          'user_id': meal.user_id
         }));
     final id = meal.name;
     _meals.add(meal);
@@ -117,7 +122,6 @@ class MealFoodFirebaseData with ChangeNotifier {
                   'quantityUnit': food.quantityUnit.toString().split('.').last,
                 })
             .toList(),
-        // 'totalCalories': meal.totalCalories,
         'datetime': meal.datetime != null
             ? {
                 'hour': meal.datetime!.hour,
@@ -125,6 +129,7 @@ class MealFoodFirebaseData with ChangeNotifier {
               }
             : null,
         'imageUrl': meal.imageUrl,
+        'user_id': meal.user_id
       });
     }
     notifyListeners();
@@ -248,7 +253,6 @@ class MealFoodFirebaseData with ChangeNotifier {
                 await mealReference.child(mealId).update({
                   'foods': {},
                   'name': _meals[mealIndex].name,
-                  // 'totalCalories': _meals[mealIndex].totalCalories,
                   'datetime': _meals[mealIndex].datetime != null
                       ? {
                           'hour': _meals[mealIndex].datetime!.hour,
