@@ -60,7 +60,7 @@ class _AppHomePageState extends State<AppHomePage> {
       Meal meal = Meal(
         name: name,
         foods: <Food>[],
-        totalCalories: totalCalories,
+        // totalCalories: totalCalories,
         datetime: date,
         imageUrl: imageUrl
       );

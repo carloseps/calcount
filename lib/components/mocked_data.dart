@@ -1,7 +1,7 @@
 import '../model/meal.dart';
 
 List<Meal> meals = [
-  Meal(name: "Café da Manhã", totalCalories: 450, foods: [
+  Meal(name: "Café da Manhã", /*totalCalories: 450,*/ foods: [
     Food(
         name: "Ovo",
         quantity: 3,
@@ -35,7 +35,7 @@ List<Meal> meals = [
         protein: 16,
         fats: 5)
   ]),
-  Meal(name: "Almoço", totalCalories: 800, foods: [
+  Meal(name: "Almoço", /*totalCalories: 800,*/ foods: [
     Food(
         name: "Peito de frango assado",
         quantity: 200,
@@ -69,7 +69,7 @@ List<Meal> meals = [
         carbohydrates: 0,
         fats: 0)
   ]),
-  Meal(name: "Lanche da tarde", totalCalories: 350, foods: [
+  Meal(name: "Lanche da tarde", /*totalCalories: 350,*/ foods: [
     Food(
         name: "Manteiga",
         quantity: 20,

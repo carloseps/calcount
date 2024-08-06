@@ -54,7 +54,7 @@ class MealFoodFirebaseData with ChangeNotifier {
           final meal = Meal(
             name: value['name'] as String? ?? '', // Corrigido aqui
             foods: foods,
-            totalCalories: value['totalCalories'] as int?,
+            // totalCalories: value['totalCalories'] as int,
             datetime: value['datetime'] != null
                 ? TimeOfDay(
                     hour: (value['datetime']['hour'] as num).toInt(),
@@ -80,7 +80,7 @@ class MealFoodFirebaseData with ChangeNotifier {
           'name': meal.name,
           'foods':
               [], //cria lista vazia de foods pois n tem como adicionar foods quando cadastra uma meal
-          'totalCalories': meal.totalCalories,
+          // 'totalCalories': meal.totalCalories,
           'datetime': meal.datetime != null
               ? {
                   'hour': meal.datetime!.hour,
@@ -117,7 +117,7 @@ class MealFoodFirebaseData with ChangeNotifier {
                   'quantityUnit': food.quantityUnit.toString().split('.').last,
                 })
             .toList(),
-        'totalCalories': meal.totalCalories,
+        // 'totalCalories': meal.totalCalories,
         'datetime': meal.datetime != null
             ? {
                 'hour': meal.datetime!.hour,
@@ -248,7 +248,7 @@ class MealFoodFirebaseData with ChangeNotifier {
                 await mealReference.child(mealId).update({
                   'foods': {},
                   'name': _meals[mealIndex].name,
-                  'totalCalories': _meals[mealIndex].totalCalories,
+                  // 'totalCalories': _meals[mealIndex].totalCalories,
                   'datetime': _meals[mealIndex].datetime != null
                       ? {
                           'hour': _meals[mealIndex].datetime!.hour,

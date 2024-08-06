@@ -121,8 +121,17 @@ class _MealListState extends State<MealList> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 0, 15, 15),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        Padding(
+                          padding:
+                          const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                          child: Text(
+                            "Total calories: ${meal.totalCalories} Kcal",
+                            style: TextStyle(
+                                color: Theme.of(context).primaryColor, fontSize: 16),
+                          ),
+                        ),
                         ClipOval(
                           child: Material(
                             color: Theme.of(context).primaryColor,

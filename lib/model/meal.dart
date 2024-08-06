@@ -3,15 +3,19 @@ import 'package:flutter/material.dart';
 class Meal {
   String name;
   List<Food> foods;
-  int? totalCalories;
+  // int? _totalCalories;
   TimeOfDay? datetime;
   String? imageUrl;
+
+  int get totalCalories {
+    return foods.fold(0, (prev, food) => prev + food.calories!);
+  }
 
   Meal(
       {
       required this.name,
       required this.foods,
-      this.totalCalories,
+      // this.totalCalories,
       this.datetime,
       this.imageUrl});
 
