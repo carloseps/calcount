@@ -6,6 +6,7 @@ import 'package:calcount/providers/user_provider.dart';
 import 'package:calcount/screens/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:toastification/toastification.dart';
 
 class AccountOptionsPage extends StatelessWidget {
@@ -35,6 +36,9 @@ class AccountOptionsPage extends StatelessWidget {
     if (user != null) {
       final accountDeleted = await userFirebaseData.deleteAccount(user);
       if (accountDeleted) {
+        final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+        await prefs.clear();
+
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
