@@ -79,6 +79,7 @@ class _MealDetailsPageState extends State<MealDetailsPage> {
       if (newImageUrl != null) {
         setState(() {
           widget.meal.imageUrl = newImageUrl;
+          print(widget.meal);
           widget.updateMeal(widget.meal);
         });
       }

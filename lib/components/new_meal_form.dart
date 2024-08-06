@@ -8,7 +8,7 @@ import 'package:image_picker/image_picker.dart';
 
 // ignore: must_be_immutable
 class MealForm extends StatefulWidget {
-  Function(String, int?, TimeOfDay?, File?) onSubmit;
+  Function(String, TimeOfDay?, File?) onSubmit;
   static final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   MealForm(this.onSubmit, {super.key});
@@ -18,7 +18,7 @@ class MealForm extends StatefulWidget {
 }
 
 class _MealFormState extends State<MealForm> {
-  final _totalCaloriesController = TextEditingController();
+  // final _totalCaloriesController = TextEditingController();
   TimeOfDay? _timeController;
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
@@ -28,13 +28,13 @@ class _MealFormState extends State<MealForm> {
   /// Retorna os dados para o widget pai por callback
   _submitForm() {
     final name = _selectedMealType.description;
-    final calories = int.tryParse(_totalCaloriesController.text);
+    // final calories = int.tryParse(_totalCaloriesController.text);
 
     if (name.isEmpty) {
       return;
     }
 
-    widget.onSubmit(name, calories, _timeController, _imageFile);
+    widget.onSubmit(name, _timeController, _imageFile);
   }
 
   _changeDropdownMealTypeValue(MealType? newMealType) {
@@ -111,11 +111,11 @@ class _MealFormState extends State<MealForm> {
               }).toList(),
               onChanged: _changeDropdownMealTypeValue,
             ),
-            TextFormField(
-              controller: _totalCaloriesController,
-              decoration:
-                  const InputDecoration(labelText: 'Total de calorias'),
-            ),
+            // TextFormField(
+            //   controller: _totalCaloriesController,
+            //   decoration:
+            //       const InputDecoration(labelText: 'Total de calorias'),
+            // ),
             Row(
               children: <Widget>[
                 Expanded(
