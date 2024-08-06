@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:calcount/firebase/user_goals_firebase_data.dart';
 import 'package:calcount/model/user.dart';
+import 'package:calcount/model/user_goals.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,6 +12,14 @@ class UserFirebaseData {
   Future<bool> register(User user) async {
     final response = await http.post(Uri.parse('$_baseUrl/users.json'),
         body: jsonEncode({'email': user.email, 'password': user.password}));
+    
+    final responseBody = json.decode(response.body);
+    String userId = responseBody['name'];
+
+    UserGoals userGoals = UserGoals(userId: userId);
+
+    UserGoalsFirebaseData userGoalsFirebaseData = UserGoalsFirebaseData();
+    await userGoalsFirebaseData.register(userGoals);
 
     return response.statusCode == 200;
   }

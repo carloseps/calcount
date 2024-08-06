@@ -1,11 +1,14 @@
 import 'dart:ffi';
 
+import 'package:calcount/firebase/meal_food_firebase_data.dart';
 import 'package:calcount/model/meal.dart';
+import 'package:calcount/providers/user_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DailyReport extends StatefulWidget {
   const DailyReport({required this.meals, super.key});
-
+  
   final List<Meal> meals;
 
   @override

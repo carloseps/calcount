@@ -1,12 +1,37 @@
+import 'package:calcount/firebase/meal_food_firebase_data.dart';
+import 'package:calcount/model/meal.dart';
+import 'package:calcount/providers/user_provider.dart';
 import 'package:calcount/screens/account_options_page.dart';
 import 'package:calcount/screens/daily_report.dart';
-import 'package:calcount/components/mocked_data.dart';
 import 'package:calcount/screens/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class NavDrawer extends StatelessWidget {
+class NavDrawer extends StatefulWidget {
   const NavDrawer({super.key});
+
+  @override
+  State<NavDrawer> createState() => _NavDrawerState();
+}
+
+class _NavDrawerState extends State<NavDrawer> {
+  List<Meal> _meals = [];
+  
+  void _fetchData() async {
+    MealFoodFirebaseData mealFoodFirebaseData = MealFoodFirebaseData();
+
+    final user_id = Provider.of<UserProvider>(context, listen: false).currentUser!.id;
+    await mealFoodFirebaseData.fetchData(user_id!);
+
+    _meals = mealFoodFirebaseData.meals;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+     _fetchData();
+  }
 
   _openDailyReportPage(BuildContext context) {
     Navigator.of(context).pop();
@@ -14,7 +39,7 @@ class NavDrawer extends StatelessWidget {
       context,
       MaterialPageRoute(
         builder: (context) => DailyReport(
-          meals: meals,
+          meals: _meals,
         ),
       ),
     );

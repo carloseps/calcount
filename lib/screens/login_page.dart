@@ -195,6 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(context);
+                                  _goToHomePage();
                                 },
                                 child: const Text('Fechar'),
                               ),

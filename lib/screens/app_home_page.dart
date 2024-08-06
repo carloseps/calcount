@@ -59,7 +59,6 @@ class _AppHomePageState extends State<AppHomePage> {
             await uploadImage(file); // Faz o upload da imagem e obtém a URL
       }
 
-      print(Provider.of<UserProvider>(context, listen: false).currentUser?.id);
       Meal meal = Meal(
         name: name,
         foods: <Food>[],
