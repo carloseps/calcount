@@ -1,11 +1,9 @@
 import 'package:calcount/firebase/firebase_messaging.dart';
 import 'package:calcount/firebase_options.dart';
 import 'package:calcount/firebase/meal_food_firebase_data.dart';
-import 'package:calcount/model/user.dart';
 import 'package:calcount/providers/user_provider.dart';
 import 'package:calcount/screens/login_page.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
@@ -14,10 +12,13 @@ import 'package:get/get.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   await FirebaseMessagingService().initNotifications();
+
   runApp(const MyApp());
 }
 

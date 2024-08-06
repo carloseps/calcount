@@ -3,6 +3,7 @@ import 'package:calcount/screens/daily_report.dart';
 import 'package:calcount/components/mocked_data.dart';
 import 'package:calcount/screens/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NavDrawer extends StatelessWidget {
   const NavDrawer({super.key});
@@ -29,6 +30,16 @@ class NavDrawer extends StatelessWidget {
     );
   }
 
+  void _logoutUser(BuildContext context) async {
+    final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+    await prefs.clear();
+
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+        ModalRoute.withName('/login'));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -48,13 +59,7 @@ class NavDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.exit_to_app),
             title: const Text('Sair'),
-            onTap: () => {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => LoginPage()),
-                  ModalRoute.withName('/login'))
-            },
+            onTap: () => _logoutUser(context),
           )
         ],
       ),
