@@ -61,6 +61,7 @@ class MealFoodFirebaseData with ChangeNotifier {
                     minute: (value['datetime']['minute'] as num).toInt(),
                   )
                 : null,
+            imageUrl: value['imageUrl']
           );
           _meals.add(meal);
         });
@@ -94,30 +95,41 @@ class MealFoodFirebaseData with ChangeNotifier {
   }
 
   Future<void> updateMeal(Meal meal) async {
-    final mealRef = mealReference.child(meal.name);
-    await mealRef.update({
-      'name': meal.name,
-      'foods': meal.foods
-          .map((food) => {
-                'name': food.name,
-                'carbohydrates': food.carbohydrates,
-                'protein': food.protein,
-                'fats': food.fats,
-                'calories': food.calories,
-                'quantity': food.quantity,
-                'quantityUnit': food.quantityUnit.toString().split('.').last,
-              })
-          .toList(),
-      'totalCalories': meal.totalCalories,
-      'datetime': meal.datetime != null
-          ? {
-              'hour': meal.datetime!.hour,
-              'minute': meal.datetime!.minute,
-            }
-          : null,
-    });
+    // Buscar o registro pelo nome
+    final snapshot = await mealReference.orderByChild('name').equalTo(meal.name).once();
+
+    // Extrair a chave do registro
+    if (snapshot.snapshot.value != null) {
+      final Map<dynamic, dynamic> mealsMap = snapshot.snapshot.value as Map<dynamic, dynamic>;
+      final String mealKey = mealsMap.keys.first;
+
+      // Atualizar o registro usando a chave
+      await mealReference.child(mealKey).update({
+        'name': meal.name,
+        'foods': meal.foods
+            .map((food) => {
+                  'name': food.name,
+                  'carbohydrates': food.carbohydrates,
+                  'protein': food.protein,
+                  'fats': food.fats,
+                  'calories': food.calories,
+                  'quantity': food.quantity,
+                  'quantityUnit': food.quantityUnit.toString().split('.').last,
+                })
+            .toList(),
+        'totalCalories': meal.totalCalories,
+        'datetime': meal.datetime != null
+            ? {
+                'hour': meal.datetime!.hour,
+                'minute': meal.datetime!.minute,
+              }
+            : null,
+        'imageUrl': meal.imageUrl,
+      });
+    }
     notifyListeners();
   }
+
 
   Future<void> removeMeal(Meal meal) async {
     try {

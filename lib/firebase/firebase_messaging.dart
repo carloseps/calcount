@@ -7,7 +7,7 @@ class FirebaseMessagingService {
     await _firebaseMessaging.requestPermission(
       alert: true,
       announcement: false,
-      badge: true,
+      badge: true,  
       carPlay: false,
       criticalAlert: false,
       provisional: false,

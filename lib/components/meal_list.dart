@@ -66,6 +66,11 @@ class _MealListState extends State<MealList> {
             return Provider.of<MealFoodFirebaseData>(context, listen: false)
                 .editFoodFromMeal(mealName, food);
           }
+          
+          Future<void> updateMeal(Meal meal) async {
+            Provider.of<MealFoodFirebaseData>(context, listen: false)
+                .updateMeal(meal);
+          }
 
           return GestureDetector(
             onTap: () {
@@ -80,6 +85,7 @@ class _MealListState extends State<MealList> {
                     onDeleteFood: deleteFood,
                     onEditFood: editFood,
                     selectedMealName: meal.name,
+                    updateMeal: updateMeal,
                   ),
                 ),
               );

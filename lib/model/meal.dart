@@ -8,7 +8,8 @@ class Meal {
   String? imageUrl;
 
   Meal(
-      {required this.name,
+      {
+      required this.name,
       required this.foods,
       this.totalCalories,
       this.datetime,
