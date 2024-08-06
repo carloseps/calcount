@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:calcount/firebase/firebase_image_data.dart';
 import 'package:calcount/model/meal.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
@@ -19,7 +20,8 @@ class MealFoodFirebaseData with ChangeNotifier {
   Future<void> fetchData(String user_id) async {
     try {
       _meals.clear();
-      final snapshot = await mealReference.orderByChild("user_id").equalTo(user_id).once();
+      final snapshot =
+          await mealReference.orderByChild("user_id").equalTo(user_id).once();
 
       if (snapshot.snapshot.value != null) {
         final data = snapshot.snapshot.value as Map<dynamic, dynamic>;
@@ -31,7 +33,7 @@ class MealFoodFirebaseData with ChangeNotifier {
           print("user_id: $user_id");
           if (value != null && value is Map && value['user_id'] == user_id) {
             print("Refeição válida");
-            if(value['foods'] != null && value['foods'] is Map) {
+            if (value['foods'] != null && value['foods'] is Map) {
               final foodData = value['foods'] as Map<dynamic, dynamic>;
               foodData.forEach((foodKey, foodValue) {
                 if (foodValue != null && foodValue is Map) {
@@ -60,13 +62,12 @@ class MealFoodFirebaseData with ChangeNotifier {
                 foods: foods,
                 datetime: value['datetime'] != null
                     ? TimeOfDay(
-                  hour: (value['datetime']['hour'] as num).toInt(),
-                  minute: (value['datetime']['minute'] as num).toInt(),
-                )
+                        hour: (value['datetime']['hour'] as num).toInt(),
+                        minute: (value['datetime']['minute'] as num).toInt(),
+                      )
                     : null,
                 imageUrl: value['imageUrl'],
-                user_id: value["user_id"]
-            );
+                user_id: value["user_id"]);
             _meals.add(meal);
           }
         });
@@ -101,27 +102,18 @@ class MealFoodFirebaseData with ChangeNotifier {
 
   Future<void> updateMeal(Meal meal) async {
     // Buscar o registro pelo nome
-    final snapshot = await mealReference.orderByChild('name').equalTo(meal.name).once();
+    final snapshot =
+        await mealReference.orderByChild('name').equalTo(meal.name).once();
 
     // Extrair a chave do registro
     if (snapshot.snapshot.value != null) {
-      final Map<dynamic, dynamic> mealsMap = snapshot.snapshot.value as Map<dynamic, dynamic>;
+      final Map<dynamic, dynamic> mealsMap =
+          snapshot.snapshot.value as Map<dynamic, dynamic>;
       final String mealKey = mealsMap.keys.first;
 
-      // Atualizar o registro usando a chave
+      // Atualizar outros campos da refeição
       await mealReference.child(mealKey).update({
         'name': meal.name,
-        'foods': meal.foods
-            .map((food) => {
-                  'name': food.name,
-                  'carbohydrates': food.carbohydrates,
-                  'protein': food.protein,
-                  'fats': food.fats,
-                  'calories': food.calories,
-                  'quantity': food.quantity,
-                  'quantityUnit': food.quantityUnit.toString().split('.').last,
-                })
-            .toList(),
         'datetime': meal.datetime != null
             ? {
                 'hour': meal.datetime!.hour,
@@ -129,12 +121,30 @@ class MealFoodFirebaseData with ChangeNotifier {
               }
             : null,
         'imageUrl': meal.imageUrl,
-        'user_id': meal.user_id
+        'user_id': meal.user_id,
       });
+
+      // Atualizar a lista de foods
+      // Primeiro, remover todas as foods existentes
+      await mealReference.child(mealKey).child('foods').remove();
+
+      // Depois, adicionar as foods atualizadas
+      for (var food in meal.foods) {
+        final foodRef = mealReference.child(mealKey).child('foods').push();
+        final foodData = {
+          'name': food.name,
+          'carbohydrates': food.carbohydrates,
+          'protein': food.protein,
+          'fats': food.fats,
+          'calories': food.calories,
+          'quantity': food.quantity,
+          'quantityUnit': food.quantityUnit.toString().split('.').last,
+        };
+        await foodRef.set(foodData);
+      }
     }
     notifyListeners();
   }
-
 
   Future<void> removeMeal(Meal meal) async {
     try {
@@ -146,6 +156,12 @@ class MealFoodFirebaseData with ChangeNotifier {
         final mealId = mealData.keys.first;
 
         final mealRef = mealReference.child(mealId);
+
+        // Verificar se a URL da imagem não é nula
+        if (meal.imageUrl != null) {
+          ImageFirebaseData().deleteImage(meal.imageUrl!);
+        }
+
         await mealRef.remove();
 
         _meals.removeWhere((m) => m.name == meal.name);
